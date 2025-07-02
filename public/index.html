@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HRA Steps API</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 20vh; }
+    h1 { color: #23604F; }
+  </style>
+</head>
+<body>
+  <h1>✅ HRA Steps Backend is up!</h1>
+  <p>Version: 1.0.0</p>
+  <p>Uptime: <span id="uptime">…</span></p>
+  <script>
+    // show server uptime if you want
+    fetch('/api/health')
+      .then(res => res.json())
+      .then(json => {
+        document.getElementById('uptime').textContent = json.uptime + 's';
+      });
+  </script>
+</body>
+</html>
