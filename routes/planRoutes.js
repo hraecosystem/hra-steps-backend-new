@@ -28,13 +28,6 @@ router.post(
 );
 
 
-// ADMIN only beyond this point
-router.use((req, res, next) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ message:'Admin access required' });
-  }
-  next();
-});
 
 // Create
 router.post(
