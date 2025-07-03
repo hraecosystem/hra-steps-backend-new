@@ -17,16 +17,13 @@ router.get(
 // Authenticated users can select
 router.post(
   '/:id/select',
-  authMiddleware,
   [ param('id').isMongoId().withMessage('Invalid plan ID') ],
   planController.selectPlan
 );
 
 //  Get active plane 
 router.post(
-  '/:id/activePlan',
-  authMiddleware,
-  [ param('id').isMongoId().withMessage('Invalid plan ID') ],
+  '/activePlan',
   planController.activePlan
 );
 

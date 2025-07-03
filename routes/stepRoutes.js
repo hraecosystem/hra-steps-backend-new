@@ -9,7 +9,6 @@ const router = express.Router();
 // Add/update steps & award challenges
 router.post(
   '/',
-  authMiddleware,
   [
     body('date').isISO8601().withMessage('Date must be ISO8601'),
     body('stepCount').isInt({ min: 0 }).withMessage('Step count must be >= 0'),

@@ -1,6 +1,6 @@
 const express                 = require('express');
 const authMiddleware          = require('../middleware/authMiddleware');
-const { getUserChallengeHistory } = require('../controllers/challengeController');
+const { getUserChallengeHistory ,stopChallenge } = require('../controllers/challengeController');
 
 const router = express.Router();
 
@@ -8,8 +8,13 @@ const router = express.Router();
 // return recent challenge completions for the logged-in user
 router.get(
   '/history',
-  authMiddleware,
   getUserChallengeHistory
 );
+router.post('/stop', stopChallenge);
 
+router.post(
+  '/:id/stop',
+  [ param('id').isMongoId().withMessage('Invalid plan ID') ],
+  stopChallenge
+);
 module.exports = router;

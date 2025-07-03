@@ -2,8 +2,8 @@
 require('dotenv').config();
 
 module.exports = {
-  port: process.env.PORT || 4000,
-  mongoURI: process.env.MONGO_URI,
+  port: process.env.PORT || 8001,
+  mongoURI: process.env.MONGODB_URI,
   jwt: {
     secret: process.env.JWT_SECRET,
     accessExpiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN || '1h',

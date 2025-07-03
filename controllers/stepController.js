@@ -79,7 +79,6 @@ exports.addSteps = async (req, res, next) => {
     next(err);
   }
 };
-
 /**
  * GET /api/steps/summary
  * Returns { today: {steps, coinsEarned, calories}, yesterday: {...} }
@@ -165,10 +164,6 @@ exports.getHistory = async (req, res, next) => {
   }
 };
 
-
-
-
-  
 exports.getTopSteppers = async (req, res, next) => {
   try {
     // parse period
