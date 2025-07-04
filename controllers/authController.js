@@ -1,10 +1,10 @@
 // backend/controllers/authController.js
-const bcrypt           = require('bcrypt');
-const crypto           = require('crypto');
-const User             = require('../models/User');
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+const User = require('../models/User');
 const { validationResult } = require('express-validator');
 const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../utils/tokenUtil');
-const emailService     = require('../services/emailService');
+const emailService = require('../services/emailService');
 
 
 exports.register = async (req, res, next) => {
@@ -35,7 +35,7 @@ exports.register = async (req, res, next) => {
 
     // 5. Generate JWTs
 
-    const accessToken  = generateAccessToken({ userId: user._id, role: user.role });
+    const accessToken = generateAccessToken({ userId: user._id, role: user.role });
     const refreshToken = generateRefreshToken({ userId: user._id, role: user.role });
 
 
@@ -80,7 +80,7 @@ exports.login = async (req, res, next) => {
     }
 
     // 3. Issue tokens
-    const accessToken  = generateAccessToken({ userId: user._id, role: user.role });
+    const accessToken = generateAccessToken({ userId: user._id, role: user.role });
     const refreshToken = generateRefreshToken({ userId: user._id, role: user.role });
 
     res.json({
@@ -112,7 +112,7 @@ exports.refreshToken = async (req, res, next) => {
     // payload now has { userId, role, iat, exp }
 
     // Issue brand-new tokens
-    const newAccessToken  = generateAccessToken({ userId: payload.userId, role: payload.role });
+    const newAccessToken = generateAccessToken({ userId: payload.userId, role: payload.role });
     const newRefreshToken = generateRefreshToken({ userId: payload.userId, role: payload.role });
 
     res.json({
@@ -139,7 +139,7 @@ exports.forgotPassword = async (req, res, next) => {
     if (!user) return res.json({ message: 'If that email exists, a link has been sent.' });
 
     const token = crypto.randomBytes(32).toString('hex');
-    user.resetPasswordToken   = token;
+    user.resetPasswordToken = token;
     user.resetPasswordExpires = Date.now() + 3600000; // 1h
     await user.save();
 
@@ -158,15 +158,15 @@ exports.resetPassword = async (req, res, next) => {
   try {
     const { token, password } = req.body;
     const user = await User.findOne({
-      resetPasswordToken:   token,
+      resetPasswordToken: token,
       resetPasswordExpires: { $gt: Date.now() },
     });
     if (!user) {
       return res.status(400).json({ message: 'Invalid or expired reset token.' });
     }
 
-    user.passwordHash         = await bcrypt.hash(password, 10);
-    user.resetPasswordToken   = undefined;
+    user.passwordHash = await bcrypt.hash(password, 10);
+    user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
     await user.save();
 
@@ -191,9 +191,9 @@ exports.requestOtp = async (req, res, next) => {
 
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    user.otpCode      = otp;
+    user.otpCode = otp;
     user.otpExpiresAt = Date.now() + 5 * 60 * 1000;   // 5 minutes
-    user.otpAttempts  = 0;
+    user.otpAttempts = 0;
     await user.save();
 
     // send via your emailService
@@ -231,10 +231,10 @@ exports.verifyOtpAndReset = async (req, res, next) => {
     }
 
     // success — reset password
-    user.passwordHash         = await bcrypt.hash(newPassword, 10);
-    user.otpCode              = undefined;
-    user.otpExpiresAt         = undefined;
-    user.otpAttempts          = 0;
+    user.passwordHash = await bcrypt.hash(newPassword, 10);
+    user.otpCode = undefined;
+    user.otpExpiresAt = undefined;
+    user.otpAttempts = 0;
     await user.save();
 
     res.json({ message: 'Password has been reset. You may now log in.' });
@@ -287,19 +287,24 @@ exports.verifyRegisterOtp = async (req, res, next) => {
     if (user.otpAttempts >= 5) {
       return res.status(429).json({ message: 'Too many attempts. Try signing up again.' })
     }
-    if (+user.otpCode !== +otp) {
+    // if (user.otpCode !== otp) {
+    //   user.otpAttempts++
+    //   await user.save()
+    //   return res.status(400).json({ message: 'Invalid code.' })
+    // }
+    const truOTp = +otp === +user.otpCode;
+    if (!truOTp) {
       user.otpAttempts++
       await user.save()
-      return res.status(400).json({ message: 'Invalid code.' })
+      return res.status(400).json({ message: "Invalid OTP ." });
     }
-
     // success! clear OTP and issue JWTs
     user.otpCode = undefined
     user.otpExpiresAt = undefined
     user.otpAttempts = 0
     await user.save()
 
-    const accessToken  = generateAccessToken({ userId: user._id, role: user.role })
+    const accessToken = generateAccessToken({ userId: user._id, role: user.role })
     const refreshToken = generateRefreshToken({ userId: user._id, role: user.role })
 
     res.status(201).json({
