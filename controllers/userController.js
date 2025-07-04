@@ -129,6 +129,7 @@ exports.clearChallenge = async (req, res, next) => {
  * Returns the updated user (minus passwordHash).
  */
 exports.updateProfile = async (req, res, next) => {
+  // upload.single('avatarUrl');
   try {
     const user = await User.findById(req.user.userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -140,6 +141,15 @@ exports.updateProfile = async (req, res, next) => {
     if (phone     !== undefined) user.phone     = phone.trim();
     if (password  !== undefined) {
       user.passwordHash = await bcrypt.hash(password, 10);
+    }
+
+
+    if(req.file) {
+      if (user.avatarUrl) {
+        const oldPath = path.join(__dirname, '..', 'public', user.avatarUrl);
+        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      }
+      user.avatarUrl =  `/avatars/${req.file.filename}` 
     }
 
     if (settings) {

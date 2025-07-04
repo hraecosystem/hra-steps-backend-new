@@ -223,7 +223,8 @@ exports.verifyOtpAndReset = async (req, res, next) => {
       return res.status(429).json({ message: 'Too many attempts. Request a new OTP.' });
 
     // verify
-    if (user.otpCode !== otp) {
+
+    if (+user.otpCode !== +otp) {
       user.otpAttempts++;
       await user.save();
       return res.status(400).json({ message: 'Invalid OTP.' });

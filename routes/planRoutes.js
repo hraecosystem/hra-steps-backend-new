@@ -21,11 +21,8 @@ router.post(
   planController.selectPlan
 );
 
-//  Get active plane 
-router.post(
-  '/activePlan',
-  planController.activePlan
-);
+// Get active plan
+router.get('/activePlan', planController.activePlan);
 
 
 

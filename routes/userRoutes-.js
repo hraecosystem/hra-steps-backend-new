@@ -1,9 +1,5 @@
 const express       = require('express');
 const { body }      = require('express-validator');
-const multer = require('multer');
-const path   = require('path');
-const fs     = require('fs');
-
 const authMiddleware= require('../middleware/authMiddleware');
 const userController= require('../controllers/userController');
 const router        = express.Router();
@@ -20,32 +16,9 @@ router.get('/challenge-status', userController.getChallengeStatus);
 router.delete('/challenge',   userController.clearChallenge);
 
 // Update personal info / password / settings
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      const dir = path.join(__dirname, '..', 'public', 'avatars');
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-      cb(null, dir);
-    },
-    filename: (req, file, cb) => {
-      const ext = path.extname(file.originalname);
-      const fn  = `${req.user.userId}-${Date.now()}${ext}`;
-      cb(null, fn);
-    }
-  }),
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
-  fileFilter: (req, file, cb) => {
-    // only accept JPEG/PNG
-    if (!['image/jpeg','image/png'].includes(file.mimetype)) {
-      return cb(new Error('Only JPG/PNG images allowed'), false);
-    }
-    cb(null, true);
-  }
-});
 router.put(
   '/profile',
   [
-    upload.single('avatarUrl'),
     // names & phone
     body('firstName').optional().isString().trim().notEmpty(),
     body('lastName').optional().isString().trim().notEmpty(),
