@@ -287,7 +287,7 @@ exports.verifyRegisterOtp = async (req, res, next) => {
     if (user.otpAttempts >= 5) {
       return res.status(429).json({ message: 'Too many attempts. Try signing up again.' })
     }
-    if (user.otpCode !== otp) {
+    if (+user.otpCode !== +otp) {
       user.otpAttempts++
       await user.save()
       return res.status(400).json({ message: 'Invalid code.' })
